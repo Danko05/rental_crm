@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Фінансовий звіт - {{ car }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="bi bi-currency-dollar"></i> Фінансовий звіт: {{ car }}</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5>Основні показники</h5>
+                <table class="table">
+                    <tr>
+                        <td>Всього оренд:</td>
+                        <td><strong>{{ total_rentals }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Загальна виручка:</td>
+                        <td><strong>{{ total_revenue|floatformat:2 }} грн</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Штрафи:</td>
+                        <td><strong>{{ total_fines|floatformat:2 }} грн</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Чистий дохід:</td>
+                        <td><strong>{{ net_revenue|floatformat:2 }} грн</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Середня тривалість оренди:</td>
+                        <td><strong>{{ avg_rental_duration }} днів</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Коефіцієнт зайнятості:</td>
+                        <td><strong>{{ occupancy_rate }}%</strong></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5>Інформація про автомобіль</h5>
+                <p><strong>Марка:</strong> {{ car.brand }}</p>
+                <p><strong>Модель:</strong> {{ car.model }}</p>
+                <p><strong>Рік:</strong> {{ car.year }}</p>
+                <p><strong>Тип:</strong> {{ car.car_type }}</p>
+                <p><strong>Ціна за добу:</strong> {{ car.daily_price }} грн</p>
+                <p><strong>Статус:</strong> {{ car.get_status_display }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-12">
+        <a href="{% url 'admin_panel:cars' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Назад до списку
+        </a>
+    </div>
+</div>
+{% endblock %}
+

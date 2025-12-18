@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Завершити оренду{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body p-5">
+                <h2 class="mb-4">Завершити оренду</h2>
+                
+                <div class="alert alert-info mb-4">
+                    <h5>Інформація про оренду:</h5>
+                    <p><strong>Клієнт:</strong> {{ rental.client.full_name }}</p>
+                    <p><strong>Автомобіль:</strong> {{ rental.car }}</p>
+                    <p><strong>Дата видачі:</strong> {{ rental.start_date }}</p>
+                    <p><strong>Очікувана дата повернення:</strong> {{ rental.expected_end_date }}</p>
+                    <p><strong>Застава:</strong> {{ rental.deposit }} грн</p>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="alert alert-warning mt-3">
+                        <strong>Рівні пошкоджень:</strong><br>
+                        0 - Без пошкоджень<br>
+                        1 - Легкі пошкодження<br>
+                        2 - Середні пошкодження<br>
+                        3 - Серйозні пошкодження
+                    </div>
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> Завершити оренду
+                        </button>
+                        <a href="{% url 'admin_panel:rental_detail' rental.id %}" class="btn btn-secondary">
+                            Скасувати
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

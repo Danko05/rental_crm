@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Управління орендами{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="bi bi-list-ul"></i> Управління орендами</h2>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="btn-group" role="group">
+            <a href="{% url 'admin_panel:rentals' %}" class="btn btn-outline-primary {% if not status_filter %}active{% endif %}">
+                Всі
+            </a>
+            <a href="?status=active" class="btn btn-outline-primary {% if status_filter == 'active' %}active{% endif %}">
+                Активні
+            </a>
+            <a href="?status=completed" class="btn btn-outline-primary {% if status_filter == 'completed' %}active{% endif %}">
+                Завершені
+            </a>
+            <a href="?status=overdue" class="btn btn-outline-primary {% if status_filter == 'overdue' %}active{% endif %}">
+                Прострочені
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Клієнт</th>
+                                <th>Автомобіль</th>
+                                <th>Дата видачі</th>
+                                <th>Дата повернення</th>
+                                <th>Вартість</th>
+                                <th>Статус</th>
+                                <th>Дії</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rental in rentals %}
+                            <tr>
+                                <td>{{ rental.client.full_name }}</td>
+                                <td>{{ rental.car }}</td>
+                                <td>{{ rental.start_date }}</td>
+                                <td>{{ rental.expected_end_date }}</td>
+                                <td>{{ rental.total_cost }} грн</td>
+                                <td>
+                                    {% if rental.status == 'active' %}
+                                    <span class="badge bg-success">{{ rental.get_status_display }}</span>
+                                    {% elif rental.status == 'completed' %}
+                                    <span class="badge bg-primary">{{ rental.get_status_display }}</span>
+                                    {% elif rental.status == 'overdue' %}
+                                    <span class="badge bg-danger">{{ rental.get_status_display }}</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">{{ rental.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'admin_panel:rental_detail' rental.id %}" class="btn btn-sm btn-info" title="Деталі">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    {% if rental.status == 'active' or rental.status == 'overdue' or rental.status == 'pending' %}
+                                    <a href="{% url 'admin_panel:rental_complete' rental.id %}" class="btn btn-sm btn-success" title="Завершити">
+                                        <i class="bi bi-check-circle"></i>
+                                    </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center text-muted">Немає оренд</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Управління типами автомобілів{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2><i class="bi bi-tags"></i> Управління типами автомобілів</h2>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{% url 'admin_panel:car_type_add' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Додати тип
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Назва</th>
+                                <th>Опис</th>
+                                <th>Кількість авто</th>
+                                <th>Дії</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for car_type in car_types %}
+                            <tr>
+                                <td><strong>{{ car_type.name }}</strong></td>
+                                <td>{{ car_type.description|default:"—" }}</td>
+                                <td>{{ car_type.car_set.count }}</td>
+                                <td>
+                                    <a href="{% url 'admin_panel:car_type_edit' car_type.id %}" class="btn btn-sm btn-primary" title="Редагувати">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{% url 'admin_panel:car_type_delete' car_type.id %}" class="btn btn-sm btn-danger" title="Видалити">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">
+                                    <p>Немає типів автомобілів</p>
+                                    <a href="{% url 'admin_panel:car_type_add' %}" class="btn btn-primary">
+                                        <i class="bi bi-plus-circle"></i> Створити перший тип
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-12">
+        <a href="{% url 'admin_panel:cars' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Назад до автомобілів
+        </a>
+    </div>
+</div>
+{% endblock %}
+

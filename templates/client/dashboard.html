@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}Особистий кабінет{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <a href="javascript:history.back()" class="btn btn-outline-secondary mb-3">
+            <i class="bi bi-arrow-left"></i> Назад
+        </a>
+        <h2><i class="bi bi-person"></i> Особистий кабінет</h2>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h4>Профіль</h4>
+                <p><strong>ПІБ:</strong> {{ client.full_name }}</p>
+                <p><strong>Email:</strong> {{ client.user.email }}</p>
+                <p><strong>Телефон:</strong> {{ client.phone }}</p>
+                <p><strong>Адреса:</strong> {{ client.address }}</p>
+                <a href="{% url 'client:profile_edit' %}" class="btn btn-primary">
+                    <i class="bi bi-pencil"></i> Редагувати профіль
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3 class="stat-value">{{ client.total_rentals }}</h3>
+                <p class="stat-label">Всього оренд</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h4>Активні оренди</h4>
+                {% if active_rentals %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Автомобіль</th>
+                                <th>Дата видачі</th>
+                                <th>Дата повернення</th>
+                                <th>Статус</th>
+                                <th>Дії</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rental in active_rentals %}
+                            <tr>
+                                <td>{{ rental.car }}</td>
+                                <td>{{ rental.start_date }}</td>
+                                <td>{{ rental.expected_end_date }}</td>
+                                <td>
+                                    {% if rental.status == 'active' %}
+                                    <span class="badge bg-success">Активна</span>
+                                    {% elif rental.status == 'pending' %}
+                                    <span class="badge bg-warning">Активна</span>
+                                    {% elif rental.status == 'overdue' %}
+                                    <span class="badge bg-danger">Прострочена</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">{{ rental.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'client:rental_detail' rental.id %}" class="btn btn-sm btn-primary">
+                                        Деталі
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">Немає активних оренд</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

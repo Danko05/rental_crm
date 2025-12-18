@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Деталі оренди{% endblock %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col-12">
+        <a href="javascript:history.back()" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Назад
+        </a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h3>Оренда #{{ rental.id }}</h3>
+                <hr>
+                <p><strong>Автомобіль:</strong> {{ rental.car }}</p>
+                <p><strong>Дата видачі:</strong> {{ rental.start_date }}</p>
+                <p><strong>Очікувана дата повернення:</strong> {{ rental.expected_end_date }}</p>
+                {% if rental.actual_end_date %}
+                <p><strong>Фактична дата повернення:</strong> {{ rental.actual_end_date }}</p>
+                {% endif %}
+                <p><strong>Застава:</strong> {{ rental.deposit }} грн</p>
+                <p><strong>Вартість:</strong> {{ rental.total_cost }} грн</p>
+                <p><strong>Статус:</strong> 
+                    {% if rental.status == 'active' %}
+                    <span class="badge bg-success">Активна</span>
+                    {% elif rental.status == 'completed' %}
+                    <span class="badge bg-primary">Завершена</span>
+                    {% elif rental.status == 'overdue' %}
+                    <span class="badge bg-danger">Прострочена</span>
+                    {% elif rental.status == 'pending' %}
+                    <span class="badge bg-warning">Активна</span>
+                    {% else %}
+                    <span class="badge bg-secondary">{{ rental.get_status_display }}</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+        
+        {% if fines %}
+        <div class="card mt-3">
+            <div class="card-body">
+                <h5>Штрафи</h5>
+                <ul class="list-group">
+                    {% for fine in fines %}
+                    <li class="list-group-item">
+                        {{ fine.reason }} - {{ fine.amount }} грн
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5>Платежі</h5>
+                <ul class="list-group">
+                    {% for payment in payments %}
+                    <li class="list-group-item">
+                        {{ payment.get_payment_type_display }}: {{ payment.amount }} грн
+                        <br><small class="text-muted">{{ payment.created_at|date:"d.m.Y H:i" }}</small>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

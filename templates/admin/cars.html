@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Управління автопарком{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2><i class="bi bi-car-front"></i> Управління автопарком</h2>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{% url 'admin_panel:car_types' %}" class="btn btn-outline-info me-2">
+            <i class="bi bi-tags"></i> Типи авто
+        </a>
+        <a href="{% url 'admin_panel:car_add' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Додати автомобіль
+        </a>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="btn-group" role="group">
+            <a href="{% url 'admin_panel:cars' %}" class="btn btn-outline-primary {% if not status_filter %}active{% endif %}">
+                Всі
+            </a>
+            <a href="?status=available" class="btn btn-outline-primary {% if status_filter == 'available' %}active{% endif %}">
+                Доступні
+            </a>
+            <a href="?status=rented" class="btn btn-outline-primary {% if status_filter == 'rented' %}active{% endif %}">
+                Орендовані
+            </a>
+            <a href="?status=maintenance" class="btn btn-outline-primary {% if status_filter == 'maintenance' %}active{% endif %}">
+                На ремонті
+            </a>
+        </div>
+        <a href="{% url 'admin_panel:cars_occupancy' %}" class="btn btn-outline-info ms-2">
+            <i class="bi bi-graph-up"></i> Звіт по зайнятості
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Автомобіль</th>
+                                <th>Рік</th>
+                                <th>Тип</th>
+                                <th>Ціна/доба</th>
+                                <th>Статус</th>
+                                <th>Дії</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for car in cars %}
+                            <tr>
+                                <td>
+                                    {% if car.photo %}
+                                    <img src="{{ car.photo.url }}" alt="{{ car }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;" class="me-2">
+                                    {% endif %}
+                                    <strong>{{ car.brand }} {{ car.model }}</strong>
+                                </td>
+                                <td>{{ car.year }}</td>
+                                <td>{{ car.car_type }}</td>
+                                <td>{{ car.daily_price }} грн</td>
+                                <td>
+                                    {% if car.status == 'available' %}
+                                    <span class="badge bg-success">{{ car.get_status_display }}</span>
+                                    {% elif car.status == 'rented' %}
+                                    <span class="badge bg-warning">{{ car.get_status_display }}</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">{{ car.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'admin_panel:car_financial' car.id %}" class="btn btn-sm btn-info" title="Фінанси">
+                                        <i class="bi bi-currency-dollar"></i>
+                                    </a>
+                                    <a href="{% url 'admin_panel:car_edit' car.id %}" class="btn btn-sm btn-primary" title="Редагувати">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{% url 'admin_panel:car_delete' car.id %}" class="btn btn-sm btn-danger" title="Видалити">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">Немає автомобілів</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

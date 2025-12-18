@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Фінансова статистика{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="bi bi-graph-up"></i> Фінансова статистика</h2>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.total_revenue|floatformat:0 }} грн</div>
+            <div class="stat-label">Загальна виручка</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.monthly_revenue|floatformat:0 }} грн</div>
+            <div class="stat-label">Дохід за місяць</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.total_fines|floatformat:0 }} грн</div>
+            <div class="stat-label">Штрафи</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-value">{{ avg_rental_cost|floatformat:0 }} грн</div>
+            <div class="stat-label">Середній чек</div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5>ТОП-5 найприбутковіших авто</h5>
+                <ul class="list-group">
+                    {% for car in stats.top_cars %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>{{ car.brand }} {{ car.model }}</span>
+                        <strong>{{ car.revenue|default:"0"|floatformat:0 }} грн</strong>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item text-muted">Немає даних</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5>Дохід за останні 30 днів</h5>
+                {% if revenue_by_period %}
+                <ul class="list-group">
+                    {% for date, amount in revenue_by_period %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>{{ date|date:"d.m.Y" }}</span>
+                        <strong>{{ amount|floatformat:2 }} грн</strong>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted">Немає даних</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

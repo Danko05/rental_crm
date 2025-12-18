@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ car }} - Деталі{% endblock %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col-12">
+        <a href="javascript:history.back()" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Назад
+        </a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            {% if car.photo %}
+            <img src="{{ car.photo.url }}" class="card-img-top" alt="{{ car }}">
+            {% else %}
+            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 400px;">
+                <i class="bi bi-car-front" style="font-size: 8rem; color: #ccc;"></i>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h2>{{ car.brand }} {{ car.model }}</h2>
+                <p class="text-muted">
+                    <i class="bi bi-calendar"></i> {{ car.year }} рік<br>
+                    <i class="bi bi-tag"></i> {{ car.car_type }}<br>
+                    <i class="bi bi-currency-dollar"></i> <strong>{{ car.daily_price }} грн/доба</strong>
+                </p>
+                {% if car.description %}
+                <p>{{ car.description }}</p>
+                {% endif %}
+                
+                {% if user.is_authenticated and user.is_client %}
+                    {% if rental_form %}
+                    <hr>
+                    <h4>Оформити оренду</h4>
+                    <form method="post" id="rentalForm">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="{{ rental_form.start_date.id_for_label }}" class="form-label">
+                                {{ rental_form.start_date.label }}
+                            </label>
+                            {{ rental_form.start_date }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ rental_form.expected_end_date.id_for_label }}" class="form-label">
+                                {{ rental_form.expected_end_date.label }}
+                            </label>
+                            {{ rental_form.expected_end_date }}
+                        </div>
+                        
+                        <!-- Блок з розрахунком сум -->
+                        <div id="priceCalculation" class="card bg-light mb-3" style="display: none;">
+                            <div class="card-body">
+                                <h5 class="card-title">Розрахунок оренди</h5>
+                                <div class="row mb-2">
+                                    <div class="col-6">
+                                        <p class="mb-1"><strong>Кількість днів:</strong></p>
+                                        <p id="rentalDays" class="text-muted">-</p>
+                                    </div>
+                                    <div class="col-6">
+                                        <p class="mb-1"><strong>Ціна за добу:</strong></p>
+                                        <p class="text-muted">{{ car.daily_price }} грн</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Деталі розрахунку -->
+                                <div id="priceDetails" style="display: none;">
+                                    <hr>
+                                    <div class="mb-2">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <span>Базова вартість:</span>
+                                            <span id="basePrice" class="text-muted">-</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <span id="yearAdjustmentLabel" class="text-muted small">-</span>
+                                            <span id="yearAdjustment" class="text-muted small">-</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <span>Після коефіцієнта за рік:</span>
+                                            <span id="priceWithYear" class="text-muted">-</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <span id="durationDiscountLabel" class="text-success small">-</span>
+                                            <span id="durationDiscount" class="text-success small">-</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <hr>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span><strong>Вартість оренди:</strong></span>
+                                    <span id="totalCost" class="fs-5 text-primary"><strong>-</strong></span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span><strong>Застава (30%):</strong></span>
+                                    <span id="deposit" class="fs-5 text-success"><strong>-</strong></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-check-circle"></i> Оформити оренду
+                        </button>
+                    </form>
+                    {% endif %}
+                {% else %}
+                <div class="alert alert-info">
+                    <a href="{% url 'client:login' %}">Увійдіть</a> для оформлення оренди
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const startDateInput = document.getElementById('id_start_date');
+    const endDateInput = document.getElementById('id_expected_end_date');
+    const priceCalculation = document.getElementById('priceCalculation');
+    const totalCostElement = document.getElementById('totalCost');
+    const depositElement = document.getElementById('deposit');
+    const rentalDaysElement = document.getElementById('rentalDays');
+    
+    const carId = {{ car.id }};
+    
+    function calculatePrice() {
+        const startDate = startDateInput.value;
+        const endDate = endDateInput.value;
+        
+        if (!startDate || !endDate) {
+            priceCalculation.style.display = 'none';
+            return;
+        }
+        
+        // Перевірка, що дати валідні
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        
+        if (end <= start) {
+            priceCalculation.style.display = 'none';
+            return;
+        }
+        
+        // Запит до сервера для розрахунку
+        const url = `/client/car/${carId}/calculate-price/?start_date=${startDate}&end_date=${endDate}`;
+        
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    priceCalculation.style.display = 'block';
+                    rentalDaysElement.textContent = data.days + ' днів';
+                    totalCostElement.innerHTML = '<strong>' + parseFloat(data.total_cost).toFixed(2) + ' грн</strong>';
+                    depositElement.innerHTML = '<strong>' + parseFloat(data.deposit).toFixed(2) + ' грн</strong>';
+                    
+                    // Відображаємо деталі розрахунку, якщо вони є
+                    const priceDetails = document.getElementById('priceDetails');
+                    if (data.details) {
+                        priceDetails.style.display = 'block';
+                        document.getElementById('basePrice').textContent = parseFloat(data.details.base_price).toFixed(2) + ' грн';
+                        document.getElementById('yearAdjustmentLabel').textContent = data.details.year_description;
+                        const yearAdj = parseFloat(data.details.year_adjustment);
+                        document.getElementById('yearAdjustment').textContent = 
+                            (yearAdj >= 0 ? '+' : '') + yearAdj.toFixed(2) + ' грн';
+                        document.getElementById('priceWithYear').textContent = parseFloat(data.details.price_with_year).toFixed(2) + ' грн';
+                        document.getElementById('durationDiscountLabel').textContent = data.details.duration_description;
+                        document.getElementById('durationDiscount').textContent = 
+                            '-' + parseFloat(data.details.duration_discount_amount).toFixed(2) + ' грн';
+                    } else {
+                        priceDetails.style.display = 'none';
+                    }
+                } else {
+                    priceCalculation.style.display = 'none';
+                    if (data.error) {
+                        console.error('Помилка:', data.error);
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Помилка при розрахунку:', error);
+                priceCalculation.style.display = 'none';
+            });
+    }
+    
+    // Додаємо обробники подій
+    if (startDateInput && endDateInput) {
+        startDateInput.addEventListener('change', calculatePrice);
+        endDateInput.addEventListener('change', calculatePrice);
+        
+        // Розраховуємо при завантаженні сторінки, якщо дати вже введені
+        if (startDateInput.value && endDateInput.value) {
+            calculatePrice();
+        }
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}

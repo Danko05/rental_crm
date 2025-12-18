@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Управління клієнтами{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="bi bi-people"></i> Управління клієнтами</h2>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-12">
+        <form method="get" class="d-flex">
+            <input type="text" name="search" class="form-control me-2" placeholder="Пошук за ПІБ, телефоном, email..." value="{{ search }}">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-search"></i> Пошук
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ПІБ</th>
+                                <th>Email</th>
+                                <th>Телефон</th>
+                                <th>Оренд</th>
+                                <th>Статус</th>
+                                <th>Дії</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for client in clients %}
+                            <tr>
+                                <td>{{ client.full_name }}</td>
+                                <td>{{ client.user.email }}</td>
+                                <td>{{ client.phone }}</td>
+                                <td>{{ client.total_rentals }}</td>
+                                <td>
+                                    {% if client.is_blocked %}
+                                    <span class="badge bg-danger">Заблокований</span>
+                                    {% else %}
+                                    <span class="badge bg-success">Активний</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'admin_panel:client_detail' client.id %}" class="btn btn-sm btn-info" title="Деталі">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{% url 'admin_panel:client_edit' client.id %}" class="btn btn-sm btn-primary" title="Редагувати">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{% url 'admin_panel:client_delete' client.id %}" class="btn btn-sm btn-danger" title="Видалити">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">Клієнтів не знайдено</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

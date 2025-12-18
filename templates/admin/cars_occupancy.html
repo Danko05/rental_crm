@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Звіт по зайнятості{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="bi bi-graph-up"></i> Звіт по зайнятості автомобілів</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Автомобіль</th>
+                                <th>Статус</th>
+                                <th>Коефіцієнт зайнятості</th>
+                                <th>Всього оренд</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in report %}
+                            <tr>
+                                <td>{{ item.car }}</td>
+                                <td>
+                                    {% if item.status == 'Доступний' %}
+                                    <span class="badge bg-success">{{ item.status }}</span>
+                                    {% elif item.status == 'Орендований' %}
+                                    <span class="badge bg-warning">{{ item.status }}</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">{{ item.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="progress">
+                                        <div class="progress-bar" role="progressbar" style="width: {{ item.occupancy_rate }}%">
+                                            {{ item.occupancy_rate }}%
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ item.total_rentals }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

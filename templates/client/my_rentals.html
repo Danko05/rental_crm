@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}Мої оренди{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <a href="javascript:history.back()" class="btn btn-outline-secondary mb-3">
+            <i class="bi bi-arrow-left"></i> Назад
+        </a>
+        <h2><i class="bi bi-list-ul"></i> Мої оренди</h2>
+    </div>
+</div>
+
+{% if active_rentals or past_rentals %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0"><i class="bi bi-check-circle"></i> Активні оренди</h4>
+            </div>
+            <div class="card-body">
+                {% if active_rentals %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Автомобіль</th>
+                                <th>Дата видачі</th>
+                                <th>Дата повернення</th>
+                                <th>Вартість</th>
+                                <th>Застава</th>
+                                <th>Статус</th>
+                                <th>Дії</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rental in active_rentals %}
+                            <tr>
+                                <td><strong>{{ rental.car }}</strong></td>
+                                <td>{{ rental.start_date|date:"d.m.Y" }}</td>
+                                <td>{{ rental.expected_end_date|date:"d.m.Y" }}</td>
+                                <td><strong>{{ rental.total_cost }} грн</strong></td>
+                                <td>{{ rental.deposit }} грн</td>
+                                <td>
+                                    {% if rental.status == 'active' %}
+                                    <span class="badge bg-success">Активна</span>
+                                    {% elif rental.status == 'pending' %}
+                                    <span class="badge bg-warning">Активна</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">{{ rental.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'client:rental_detail' rental.id %}" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-eye"></i> Деталі
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">Немає активних оренд</p>
+                {% endif %}
+                
+                {% if past_rentals %}
+                <hr>
+                <h5 class="mb-3"><i class="bi bi-clock-history"></i> Всі минулі оренди</h5>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Автомобіль</th>
+                                <th>Дата видачі</th>
+                                <th>Дата повернення</th>
+                                <th>Вартість</th>
+                                <th>Статус</th>
+                                <th>Дії</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rental in past_rentals %}
+                            <tr>
+                                <td>{{ rental.car }}</td>
+                                <td>{{ rental.start_date|date:"d.m.Y" }}</td>
+                                <td>
+                                    {% if rental.actual_end_date %}
+                                    {{ rental.actual_end_date|date:"d.m.Y" }}
+                                    {% else %}
+                                    {{ rental.expected_end_date|date:"d.m.Y" }}
+                                    {% endif %}
+                                </td>
+                                <td>{{ rental.total_cost }} грн</td>
+                                <td>
+                                    {% if rental.status == 'completed' %}
+                                    <span class="badge bg-primary">{{ rental.get_status_display }}</span>
+                                    {% elif rental.status == 'overdue' %}
+                                    <span class="badge bg-danger">{{ rental.get_status_display }}</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">{{ rental.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'client:rental_detail' rental.id %}" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-eye"></i> Деталі
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if not active_rentals and not past_rentals %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-info text-center">
+            <i class="bi bi-info-circle" style="font-size: 3rem;"></i>
+            <h4 class="mt-3">У вас немає оренд</h4>
+            <p>Перегляньте <a href="{% url 'client:catalog' %}">каталог автомобілів</a> та оформіть оренду!</p>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

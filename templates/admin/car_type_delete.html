@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Видалити тип автомобіля{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body p-5">
+                <h2 class="mb-4">Видалити тип автомобіля?</h2>
+                <p>Ви впевнені, що хочете видалити <strong>{{ car_type.name }}</strong>?</p>
+                {% if car_type.car_set.exists %}
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle"></i> Цей тип використовується в {{ car_type.car_set.count }} автомобілях!
+                </div>
+                {% endif %}
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Видалити
+                    </button>
+                    <a href="{% url 'admin_panel:car_types' %}" class="btn btn-secondary">
+                        Скасувати
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

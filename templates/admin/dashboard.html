@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Панель адміністратора{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="bi bi-speedometer2"></i> Панель адміністратора</h2>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.total_cars }}</div>
+            <div class="stat-label">Всього авто</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.available_cars }}</div>
+            <div class="stat-label">Доступні</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.active_rentals }}</div>
+            <div class="stat-label">Активні оренди</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.total_clients }}</div>
+            <div class="stat-label">Клієнтів</div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.monthly_revenue|floatformat:0 }} грн</div>
+            <div class="stat-label">Дохід за місяць</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.total_revenue|floatformat:0 }} грн</div>
+            <div class="stat-label">Загальна виручка</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.total_fines|floatformat:0 }} грн</div>
+            <div class="stat-label">Штрафи</div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5>Швидкі дії</h5>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'admin_panel:cars' %}" class="btn btn-primary">
+                        <i class="bi bi-car-front"></i> Управління автопарком
+                    </a>
+                    <a href="{% url 'admin_panel:clients' %}" class="btn btn-primary">
+                        <i class="bi bi-people"></i> Управління клієнтами
+                    </a>
+                    <a href="{% url 'admin_panel:rentals' %}" class="btn btn-primary">
+                        <i class="bi bi-list-ul"></i> Управління орендами
+                    </a>
+                    <a href="{% url 'admin_panel:statistics' %}" class="btn btn-primary">
+                        <i class="bi bi-graph-up"></i> Фінансова статистика
+                    </a>
+                    <a href="{% url 'admin_panel:car_types' %}" class="btn btn-outline-primary">
+                        <i class="bi bi-tags"></i> Типи автомобілів
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5>ТОП-5 найприбутковіших авто</h5>
+                <ul class="list-group">
+                    {% for car in stats.top_cars %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>{{ car.brand }} {{ car.model }}</span>
+                        <strong>{{ car.revenue|default:"0"|floatformat:0 }} грн</strong>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item text-muted">Немає даних</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
